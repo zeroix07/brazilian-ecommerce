@@ -5,6 +5,7 @@ The Dataset Brazilian E-Commerce from [kaggle](https://www.kaggle.com/datasets/o
 ---
 # Setup Environment
 pip install requirements.txt
+
 ---
 # See the result Visualization with Streamlit <br>
  - streamlit run dashboard.py
