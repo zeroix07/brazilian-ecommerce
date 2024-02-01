@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[11]:
+# In[8]:
 
 
 import pandas as pd
@@ -14,7 +14,7 @@ from babel.numbers import format_currency
 sns.set(style='dark')
 
 
-# In[2]:
+# In[9]:
 
 
 # Set daily_orders function to return daily_orders_df
@@ -120,10 +120,10 @@ def sellers_order(df):
 colors=["#3187d4",'#b3bcc4','#b3bcc4','#b3bcc4','#b3bcc4','#b3bcc4','#b3bcc4','#b3bcc4','#b3bcc4','#b3bcc4']
 
 
-# In[3]:
+# In[11]:
 
 
-main_df = pd.read_csv('C:/Users/ASUS/Downloads/dashboard.csv')
+main_df = pd.read_csv('https://raw.githubusercontent.com/zeroix07/brazilian-ecommerce/main/dashboard/dashboard.csv')
 
 
 # In[4]:
@@ -569,142 +569,4 @@ def customers_analysis():
         st.dataframe(filtered_rfm_df)
     else:
         st.write("No Results")
-
-
-# In[12]:
-
-
-################################### SELLERS ###################################
-def sellers_analysis():
-    sellers_in_cities, sellers_in_states = count_sellers(main_df)
-    seller_count_sum_order = sellers_order(main_df)
-
-    #Distribution of Sellers by City and State
-    st.subheader("Distribution of Sellers by City and State")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        total_count_seller = main_df.seller_id.nunique()
-        st.metric("Total Number of Sellers", value=total_count_seller)
-
-    with col2:
-        highest_count_seller_city = sellers_in_cities.count_seller.max()
-        st.metric("Highest by City", value=highest_count_seller_city)
-
-    with col3:
-        highest_count_seller_state = sellers_in_states.count_seller.max()
-        st.metric("Highest by State", value=highest_count_seller_state)
-    
-    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(30, 10))
-
-    sns.barplot(x="seller_city", 
-                y="count_seller", 
-                data= sellers_in_cities.sort_values('count_seller', ascending=False).head(10), 
-                palette= colors, 
-                ax=ax[0])
-    ax[0].set_ylabel(None)
-    ax[0].set_xlabel(None)
-    ax[0].tick_params(axis='x', labelrotation=45)
-    ax[0].set_title("Based on City", loc="center", fontsize=18, pad=10)
-    ax[0].tick_params(axis ='y', labelsize=15)
-    ax[0].tick_params(axis='x', labelsize=15)
-
-    sns.barplot(x="seller_state", 
-                y="count_seller", 
-                data= sellers_in_states.sort_values('count_seller', ascending=False).head(10),
-                palette= colors, 
-                ax=ax[1])
-    ax[1].set_ylabel(None)
-    ax[1].set_xlabel(None)
-    ax[1].tick_params(axis='x', labelrotation=50)
-    ax[1].set_title("Based on State", loc="center", fontsize=18, pad=10)
-    ax[1].tick_params(axis='y', labelsize=15)
-    ax[1].tick_params(axis='x', labelsize=15)
-
-    plt.suptitle("Distribution of Number of Sellers by City and State", fontsize=20)
-    st.pyplot(fig)
-
-    #Seller with Largest Order
-    st.subheader("Seller with Largest Number of Order and Total Order Value")
-    tab1, tab2 = st.tabs(['Count Order','Total Order Value'])
- 
-    with tab1:
-        col1, col2, col3 = st.columns(3)
- 
-        with col1:
-            max_seller_count_order = seller_count_sum_order.count_order.max()
-            st.metric("Highest Number of Order", value=max_seller_count_order)
-
-        with col2:
-            min_seller_count_order = seller_count_sum_order.count_order.min()
-            st.metric("Lowest Number of Order", value=min_seller_count_order)
-
-        with col3:
-            avg_seller_count_order = seller_count_sum_order.count_order.mean().astype(int)
-            st.metric("Average Number of Order", value=avg_seller_count_order)
-        
-        fig, ax = plt.subplots(figsize=(25, 10))
-        sns.barplot(x="count_order", 
-                    y="seller_id", 
-                    data= seller_count_sum_order.sort_values('count_order',ascending=False).head(10), 
-                    palette= colors,
-                    ax=ax)
-        ax.set_ylabel('Seller ID', fontsize=18, labelpad=10)
-        ax.set_xlabel('Number of Order', fontsize=18, labelpad=10)
-        ax.set_title("Seller with Largest Number of Order", loc="center", fontsize=20, pad=10)
-        ax.bar_label(ax.containers[0], label_type='center')
-        ax.tick_params(axis ='y', labelsize=15)
-        ax.tick_params(axis ='x', labelsize=15)
-        st.pyplot(fig)
- 
-    with tab2:
-        col1, col2, col3 = st.columns(3)
- 
-        with col1:
-            max_seller_order_value = format_currency(seller_count_sum_order.sum_order_value.max(), "R$", locale='pt_BR')
-            st.metric("Highest Total Order Value", value=max_seller_order_value)
-
-        with col2:
-            min_seller_order_value = format_currency(seller_count_sum_order.sum_order_value.min(), "R$", locale='pt_BR')
-            st.metric("Lowest Total Order Value", value=min_seller_order_value)
-        
-        with col3:
-            avg_seller_order_value = format_currency(seller_count_sum_order.sum_order_value.mean(), "R$", locale='pt_BR')
-            st.metric("Average Total Order Value", value=avg_seller_order_value)
-
-        
-        fig, ax = plt.subplots(figsize=(25, 10))
-
-        sns.barplot(x="sum_order_value", 
-                    y="seller_id", 
-                    data= seller_count_sum_order.sort_values('sum_order_value',ascending=False).head(10), 
-                    palette= colors,
-                    ax=ax)
-        ax.set_ylabel('Seller ID', fontsize=18, labelpad=10)
-        ax.set_xlabel('Total Order Value (R$)', fontsize=18, labelpad=10)
-        ax.set_title("Seller with Largest Total Order Value", loc="center", fontsize=20, pad=10)
-        ax.bar_label(ax.containers[0], label_type='center')
-        ax.tick_params(axis ='y', labelsize=15)
-        ax.tick_params(axis ='x', labelsize=15)
-        st.pyplot(fig)
-
-#Make function with radio button on sidebar to call analysis function
-def sidebar_function():
-    with st.sidebar:
-        selected= option_menu(
-            menu_title= "Analyze What?",
-            options=["Orders","Customers","Sellers"],
-            icons=["cart-fill","people-fill","shop-window"],
-            menu_icon="clipboard-data-fill",
-            default_index=0
-            )
-
-    if selected =="Orders":
-        orders_analysis()
-    if selected=="Customers":
-        customers_analysis()
-    if selected=="Sellers":
-        sellers_analysis()
-sidebar_function()
-
-st.sidebar.caption('Copyright © Fadhel Muhammad Apriansyah - 2024')
 
